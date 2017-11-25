@@ -76,7 +76,11 @@ SpaceHipster.GameState = {
 
     //enemy
     this.initEnemies();
+
+    this.loadLevel();
   },
+
+
   update: function() {
     this.game.physics.arcade.overlap(
       this.playerBullets,
@@ -135,17 +139,7 @@ SpaceHipster.GameState = {
     this.enemyBullets = this.game.add.group();
     this.enemyBullets.enableBody = true;
 
-    var enemy = new SpaceHipster.Enemy(
-      this.game,
-      100,
-      100,
-      'greenEnemy',
-      10,
-      this.enemyBullets
-    );
-    this.enemies.add(enemy);
-    enemy.body.velocity.x = 100;
-    enemy.body.velocity.y = 20;
+    // this.createEnemy()
   },
 
   damageEnemy: function(bullet, enemy) {
@@ -157,6 +151,85 @@ SpaceHipster.GameState = {
   killPlayer: function() {
     this.player.kill();
     this.game.state.restart();
+  }, 
+
+  createEnemy: function(x, y, health, key, scale, speedX, speedY) {
+    var enemy = this.enemies.getFirstExists(false);
+
+    if (!enemy) {
+      enemy = new SpaceHipster.Enemy(this.game, x, y, key, health, this.enemyBullets);
+      this.enemies.add(enemy);
+    }
+  
+    enemy.reset(x, y, health, key, scale, speedX, speedY);
+
+
+  },
+
+  loadLevel: function() {
+    this.currentEnemyIndex = 0;
+
+    this.levelData = {
+      "duration": 35,
+      "enemies": 
+      [
+        {
+          "time": 1,
+          "x": 0.05,
+          "health": 6,
+          "speedX": 20, 
+          "speedY": 50,
+          "key": "greenEnemy",
+          "scale": 3
+        },
+        {
+          "time": 2,
+          "x": 0.1,
+          "health": 3,
+          "speedX": 50, 
+          "speedY": 50,
+          "key": "greenEnemy",
+          "scale": 1
+        },
+        {
+          "time": 3,
+          "x": 0.1,
+          "health": 3,
+          "speedX": 50, 
+          "speedY": 50,
+          "key": "greenEnemy",
+          "scale": 1
+        },
+        {
+          "time": 4,
+          "x": 0.1,
+          "health": 3,
+          "speedX": 50, 
+          "speedY": 50,
+          "key": "greenEnemy",
+          "scale": 1
+        }]
+      };
+
+      this.scheduleNextEnemy();
+  },
+
+  scheduleNextEnemy: function() {
+    var nextEnemy = this.levelData.enemies[this.currentEnemyIndex];
+
+    if (nextEnemy) {
+      var nextTime = 1000 * nextEnemy.time - (this.currentEnemyIndex == 0 ? 0 : 
+        this.levelData.enemies[this.currentEnemyIndex - 1].time);
+
+      this.nextEnemyTimer = this.game.time.events.add(nextTime, function() {
+        this.createEnemy(nextEnemy.x * this.game.world.width, -100, 
+          nextEnemy.health, nextEnemy.key, nextEnemy.scale, nextEnemy.speedX, nextEnemy.speedY);
+
+          this.currentEnemyIndex++;
+
+          this.scheduleNextEnemy();
+      }, this)
+    }
   }
 
 
