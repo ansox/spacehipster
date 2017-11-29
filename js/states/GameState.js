@@ -49,6 +49,13 @@ SpaceHipster.GameState = {
       1,
       1
     );
+
+    this.load.text('level1', 'assets/data/level1.json');
+    this.load.text('level2', 'assets/data/level2.json');
+    this.load.text('level3', 'assets/data/level3.json');
+
+    this.load.audio('orchestra', ['assets/audio/8bit-orchestra.mp3', 'assets/audio/8bit-orchestra.ogg']);
+    
   },
   //executed after everything is loaded
   create: function() {
@@ -83,6 +90,9 @@ SpaceHipster.GameState = {
     this.initEnemies();
 
     this.loadLevel();
+
+    this.orchestra = this.add.audio('orchestra');
+    this.orchestra.play();
   },
 
 
@@ -155,6 +165,7 @@ SpaceHipster.GameState = {
 
   killPlayer: function() {
     this.player.kill();
+    this.orchestra.stop();
     this.game.state.restart();
   }, 
 
@@ -174,51 +185,13 @@ SpaceHipster.GameState = {
   loadLevel: function() {
     this.currentEnemyIndex = 0;
 
-    this.levelData = {
-      "duration": 5,
-      "enemies": 
-      [
-        {
-          "time": 1,
-          "x": 0.05,
-          "health": 6,
-          "speedX": 20, 
-          "speedY": 50,
-          "key": "greenEnemy",
-          "scale": 3
-        },
-        {
-          "time": 2,
-          "x": 0.1,
-          "health": 3,
-          "speedX": 50, 
-          "speedY": 50,
-          "key": "greenEnemy",
-          "scale": 1
-        },
-        {
-          "time": 3,
-          "x": 0.1,
-          "health": 3,
-          "speedX": 50, 
-          "speedY": 50,
-          "key": "greenEnemy",
-          "scale": 1
-        },
-        {
-          "time": 4,
-          "x": 0.1,
-          "health": 3,
-          "speedX": 50, 
-          "speedY": 50,
-          "key": "greenEnemy",
-          "scale": 1
-        }]
-      };
+    this.levelData = JSON.parse(this.game.cache.getText('level' + this.currentLevel));
 
       //end of the level
       this.endOfLevelTimer = this.game.time.events.add(this.levelData.duration * 1000, function() {
         console.log('level ended');
+
+        this.orchestra.stop();
 
         if (this.currentLevel < this.numLevels) {
           this.currentLevel++;
