@@ -4,6 +4,8 @@ SpaceHipster.GameState = {
   //initiate game settings
   init: function(currentLevel) {
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.scale.pageAlignHorizontally = true;
+    this.scale.pageAlignVertically = true;
 
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -13,7 +15,10 @@ SpaceHipster.GameState = {
     //level
     this.numLevels = 3;
     this.currentLevel = currentLevel || 1;
-    console.log(this.currentLevel);
+   
+    this.cursors = this.game.input.keyboard.createCursorKeys();
+
+    this.game.world.setBounds(0, 0, 360, 700);
   },
 
   //load the game assets before the game starts
@@ -72,7 +77,7 @@ SpaceHipster.GameState = {
     //player
     this.player = this.game.add.sprite(
       this.game.world.centerX,
-      this.game.world.height - 50,
+      this.game.world.height - 150,
       'player'
     );
     this.player.anchor.setTo(0.5);
@@ -121,6 +126,10 @@ SpaceHipster.GameState = {
       var direction = targetX >= this.game.world.centerX ? 1 : -1;
 
       this.player.body.velocity.x = direction * this.PLAYER_SPEED;
+    } else if (this.cursors.left.isDown) {
+      this.player.body.velocity.x = -1 * this.PLAYER_SPEED;
+    } else if (this.cursors.right.isDown) {
+      this.player.body.velocity.x = this.PLAYER_SPEED;
     }
   },
 
